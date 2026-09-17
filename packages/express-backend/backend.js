@@ -15,6 +15,7 @@ const findUserByNameAndJob = (name, job) => {
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
+const generateId = () => Math.random().toString(36).slice(2, 8);
 
 
 
@@ -67,24 +68,38 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
+  user.id = generateId();
   users["users_list"].push(user);
   return user;
 };
 
-const deleteUser = (user) => {
-  users["users_list"].pop(user);
-}
+const deleteUser = (id) => {
+  const userIndex = users["users_list"].findIndex((user) => user.id === id);
+
+  if (userIndex === -1) {
+    return false;
+  }
+
+  users["users_list"].splice(userIndex, 1);
+  return true;
+};
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  const newUser = addUser(userToAdd);
+  res.status(201).send(newUser);
 });
 
-app.delete("/users", (req, res) => {
-  deleteUser(req.body);
-  res.send()
-})
+app.delete("/users/:id", (req, res) => {
+  const wasDeleted = deleteUser(req.params.id);
+
+  if (!wasDeleted) {
+    res.status(404).send("Resource not found.");
+    return;
+  }
+
+  res.status(204).send();
+});
 
 app.get("/users", (req, res) => {
   const name = req.query.name;
