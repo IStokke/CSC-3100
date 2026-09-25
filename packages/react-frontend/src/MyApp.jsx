@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
 
@@ -15,7 +15,7 @@ function MyApp() {
       .then((res) => {
         if (res.status === 204) {
           setCharacters((currentCharacters) => {
-            return currentCharacters.filter((character) => character.id !== id);
+            return currentCharacters.filter((character) => character._id !== id);
           });
         }
       })
